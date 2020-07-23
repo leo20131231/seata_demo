@@ -1,0 +1,70 @@
+server:
+  port: 8109
+#====================================stream =============================================
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/seata?useSSL=false&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+    username: root
+    password: root
+  application:
+    name: dubbo-storage-example
+
+#====================================Dubbo config===============================================
+dubbo:
+  application:
+    id: dubbo-storage-example
+    name: dubbo-storage-example
+    qosEnable: false
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: 20888
+  registry:
+    id: dubbo-storage-example-registry
+    address: nacos://127.0.0.1:8848
+  config-center:
+    address: nacos://127.0.0.1:8848
+  metadata-report:
+    address: nacos://127.0.0.1:8848
+#====================================mybatis-plus config===============================================
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
+  typeAliasesPackage: io.seata.samples.integration.*.entity
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+#====================================Seata Config===============================================
+seata:
+  enabled: true
+  application-id: ${spring.application.name}-seata
+  tx-service-group: my_test_tx_group
+  enable-auto-data-source-proxy: true
+  service:
+    vgroup-mapping:
+      my_test_tx_group: my_test_tx_group
+    grouplist:
+      - localhost:8091
+      #- xxxxxxx.8093
+  config:
+    type: nacos
+    #file:
+    #  name: file.conf 【namespace: seata-config-1】
+    nacos:
+      namespace:
+      serverAddr: localhost:8848
+      group: SEATA_GROUP
+      userName: "nacos"
+      password: "nacos"
+  registry:
+    type: nacos
+    nacos:
+      #与seata server的registry.conf的nacos名字相同
+      application: seata-server
+      server-addr: localhost:8848
+      namespace:
+      userName: "nacos"
+      password: "nacos"
