@@ -17,9 +17,16 @@
 
 package com.work.storage.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * StringConsumer
@@ -27,8 +34,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RocketMQMessageListener(topic = "${demo.rocketmq.topic}", consumerGroup = "storage-group")
 public class StringConsumer implements RocketMQListener<String> {
+
+    @Resource
+    private StorageService storageService;
     @Override
     public void onMessage(String message) {
         System.out.printf("------- StringConsumer received: %s \n", message);
+        JSONObject orderBean = JSON.parseObject(message, JSONObject.class);
+        storageService.deduct(orderBean.get("commodityCode").toString(),
+                Integer.parseInt(orderBean.get("count").toString()));
+
     }
 }
